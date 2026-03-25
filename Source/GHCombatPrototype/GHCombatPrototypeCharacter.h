@@ -5,7 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "GHAttributeSet.h"  
 #include "GHCombatPrototypeCharacter.generated.h"
+
+class UAbilitySystemComponent;
+class UGHAttributeSet;
+class UGameplayAbility;
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -15,11 +22,12 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 /**
- *  A simple player-controllable third person character
+ *  A simple player-controllable third person character that has an Ability System Component and a health 
+ *  Attribute Set.
  *  Implements a controllable orbiting camera
  */
 UCLASS(abstract)
-class AGHCombatPrototypeCharacter : public ACharacter
+class AGHCombatPrototypeCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -49,15 +57,43 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
+	/** Cast Spell Input Action */
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* CastSpellAction;
+
 public:
 
 	/** Constructor */
 	AGHCombatPrototypeCharacter();	
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 protected:
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	/** GAS Core */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivate))
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UGHAttributeSet> AttributeSet;
+
+	/** Ability granted on possesion */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
+	TSubclassOf<UGameplayAbility> DefaultAbility;
+
+	/** internal init */
+	void InitializeAbilitySystem();
+
+	/** Server-only grant */
+	void GrantStartupAbilities();
+
+	/** Casts the spell */
+	void ActivateSpellAbility();
 
 protected:
 
@@ -92,5 +128,8 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/** Returns AttributeSet subobject **/
+	FORCEINLINE UGHAttributeSet* GetAttributeSet() const { return AttributeSet; }
 };
 

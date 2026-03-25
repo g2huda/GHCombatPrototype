@@ -10,7 +10,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "GHCombatPrototype.h"
+#include "AbilitySystemComponent.h"
+#include "GHAttributeSet.h"            
+#include "GHCombatPrototype.h"        
+
 
 AGHCombatPrototypeCharacter::AGHCombatPrototypeCharacter()
 {
@@ -46,8 +49,22 @@ AGHCombatPrototypeCharacter::AGHCombatPrototypeCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	//GAS Setup
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+	AttributeSet = CreateDefaultSubobject<UGHAttributeSet>(TEXT("AttributeSet"));
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+UAbilitySystemComponent* AGHCombatPrototypeCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void AGHCombatPrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,10 +82,49 @@ void AGHCombatPrototypeCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGHCombatPrototypeCharacter::Look);
+	
+		// Casting a spell
+		EnhancedInputComponent->BindAction(CastSpellAction, ETriggerEvent::Started, this, &AGHCombatPrototypeCharacter::ActivateSpellAbility);
 	}
 	else
 	{
 		UE_LOG(LogGHCombatPrototype, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void AGHCombatPrototypeCharacter::ActivateSpellAbility()
+{
+	if(AbilitySystemComponent && DefaultAbility)
+	{
+		AbilitySystemComponent->TryActivateAbilityByClass(DefaultAbility);
+	}
+}
+
+void AGHCombatPrototypeCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	InitializeAbilitySystem();
+
+	if(HasAuthority())
+	{
+		GrantStartupAbilities();
+	}
+}
+
+void AGHCombatPrototypeCharacter::InitializeAbilitySystem()
+{
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+
+void AGHCombatPrototypeCharacter::GrantStartupAbilities()
+{
+	if(AbilitySystemComponent && DefaultAbility)
+	{
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(DefaultAbility, 1, 0));
 	}
 }
 
