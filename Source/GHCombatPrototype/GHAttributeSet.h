@@ -28,13 +28,16 @@ public:
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UGHAttributeSet, Health)
 
-	UPROPERTY(BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnMaxHealthUpdated)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UGHAttributeSet, MaxHealth)
 
 protected:
 	UFUNCTION()
 	void OnHealthUpdated(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnMaxHealthUpdated(const FGameplayAttributeData& OldValue);
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 

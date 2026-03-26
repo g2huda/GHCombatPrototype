@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GHAttributeSet.h"
@@ -15,6 +15,11 @@ void UGHAttributeSet::OnHealthUpdated(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGHAttributeSet, Health, OldValue);
 }
 
+void UGHAttributeSet::OnMaxHealthUpdated(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGHAttributeSet, MaxHealth, OldValue);
+}
+
 void UGHAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
@@ -28,11 +33,37 @@ void UGHAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, f
 void UGHAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+	float newHealth = GetHealth();
+
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		float newHealth = GetHealth();
 		newHealth = FMath::Clamp(newHealth, 0.f, GetMaxHealth());
 		SetHealth(newHealth);
+	}
+
+	//Log the attribute change for debugging purposes
+	AActor* OwnerActor = nullptr;
+
+	if (Data.Target.AbilityActorInfo.IsValid())
+	{
+		OwnerActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Health changed: %s → %f"),
+		OwnerActor ? *OwnerActor->GetName() : TEXT("Unknown"),
+		newHealth
+	);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.5f,
+			FColor::Red,
+			FString::Printf(TEXT("%s Health: %.1f"),
+				OwnerActor ? *OwnerActor->GetName() : TEXT("Unknown"),
+				newHealth)
+		);
 	}
 }
 
