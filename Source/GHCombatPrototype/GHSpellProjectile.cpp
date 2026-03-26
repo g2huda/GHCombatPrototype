@@ -6,7 +6,6 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h" 
 #include "GameplayEffect.h"
-#include <Net/UnrealNetwork.h>
 
 // Sets default values
 AGHSpellProjectile::AGHSpellProjectile()
@@ -134,5 +133,5 @@ void AGHSpellProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(AGHSpellProjectile, SourceActor);
+   // DOREPLIFETIME(AGHSpellProjectile, SourceActor);
 }

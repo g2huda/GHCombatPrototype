@@ -78,6 +78,7 @@ void AGHCombatPrototypeCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 void AGHCombatPrototypeCharacter::ActivateSpellAbility()
 {
+	UE_LOG(LogGHCombatPrototype, Log, TEXT("'%s' ActivateSpellAbility called!"), *GetNameSafe(this));
 	if(AbilitySystemComponent && DefaultAbility)
 	{
 		AbilitySystemComponent->TryActivateAbilityByClass(DefaultAbility);

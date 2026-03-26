@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "AbilitySystemComponent.h"
 #include "Engine/World.h"
+#include "GHCombatPrototype.h"
 
 UGA_SpellProjectile::UGA_SpellProjectile()
 {
@@ -19,6 +20,8 @@ void UGA_SpellProjectile::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogGHCombatPrototype, Log, TEXT("UGA_SpellProjectile::ActivateAbility called"));
+
 	if (!ActorInfo || !ActorInfo->AvatarActor.IsValid())
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
