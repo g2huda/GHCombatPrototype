@@ -3,21 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystemComponent.h"
-#include "GHAttributeSet.h"  
+#include "GHCharacterBase.h"
 #include "GHCombatPrototypeCharacter.generated.h"
-
-class UAbilitySystemComponent;
-class UGHAttributeSet;
-class UGameplayAbility;
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 struct FInputActionValue;
+class AGHCharacterBase;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -27,7 +21,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  Implements a controllable orbiting camera
  */
 UCLASS(abstract)
-class AGHCombatPrototypeCharacter : public ACharacter, public IAbilitySystemInterface
+class AGHCombatPrototypeCharacter : public AGHCharacterBase
 {
 	GENERATED_BODY()
 
@@ -66,8 +60,6 @@ public:
 	/** Constructor */
 	AGHCombatPrototypeCharacter();	
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
 protected:
 
 	/** Initialize input action bindings */
@@ -75,26 +67,13 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	/** GAS Core */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivate))
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UGHAttributeSet> AttributeSet;
-
 	/** Ability granted on possesion */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TSubclassOf<UGameplayAbility> DefaultAbility;
 
-	/** internal init */
-	void InitializeAbilitySystem();
-
 	/** Server-only grant */
 	void GrantStartupAbilities();
-
-	/** Casts the spell */
-	void ActivateSpellAbility();
-
+	
 protected:
 
 	/** Called for movement input */
@@ -104,6 +83,10 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 public:
+
+	/** Casts the spell */
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void ActivateSpellAbility();
 
 	/** Handles move inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
@@ -128,8 +111,4 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-	/** Returns AttributeSet subobject **/
-	FORCEINLINE UGHAttributeSet* GetAttributeSet() const { return AttributeSet; }
 };
-

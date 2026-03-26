@@ -11,9 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "AbilitySystemComponent.h"
-#include "GHAttributeSet.h"            
-#include "GHCombatPrototype.h"        
-
+#include "GHCombatPrototype.h"
 
 AGHCombatPrototypeCharacter::AGHCombatPrototypeCharacter()
 {
@@ -49,22 +47,8 @@ AGHCombatPrototypeCharacter::AGHCombatPrototypeCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	//GAS Setup
-	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true;
-
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Full);
-	AttributeSet = CreateDefaultSubobject<UGHAttributeSet>(TEXT("AttributeSet"));
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-}
-
-UAbilitySystemComponent* AGHCombatPrototypeCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
 }
 
 void AGHCombatPrototypeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -109,14 +93,6 @@ void AGHCombatPrototypeCharacter::PossessedBy(AController* NewController)
 	if(HasAuthority())
 	{
 		GrantStartupAbilities();
-	}
-}
-
-void AGHCombatPrototypeCharacter::InitializeAbilitySystem()
-{
-	if(AbilitySystemComponent)
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
 }
 
