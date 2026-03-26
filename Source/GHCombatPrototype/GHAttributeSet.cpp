@@ -2,6 +2,7 @@
 
 
 #include "GHAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 UGHAttributeSet::UGHAttributeSet()
 {
@@ -38,4 +39,6 @@ void UGHAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 void UGHAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGHAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UGHAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 }
