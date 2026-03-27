@@ -50,7 +50,11 @@ protected:
         const FHitResult& SweepResult
     );
 
+	//TODO: these fucntions should be implemented within the enemey class, and the projectile should just 
+    // broadcast an event or interface call to the enemy when hit. This will allow for more flexible 
+    // interactions and better separation of concerns.
     void ApplyDamageToTarget(AActor* TargetActor);
+    void TriggerGameplayCue(AActor* TargetActor, UAbilitySystemComponent* TargetASC);
     void DestroyProjectile();
 
 public:
