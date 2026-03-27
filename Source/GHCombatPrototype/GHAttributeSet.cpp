@@ -41,6 +41,8 @@ void UGHAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		SetHealth(newHealth);
 	}
 
+	OnHealthUpdatedDelegate.Broadcast(newHealth);
+
 	//Log the attribute change for debugging purposes
 	AActor* OwnerActor = nullptr;
 

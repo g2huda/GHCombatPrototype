@@ -23,11 +23,16 @@ AGHCharacterBase::AGHCharacterBase()
 void AGHCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	BindAttributeDelegates();
 }
 
 void AGHCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+}
+
+void AGHCharacterBase::HandleHealthUpdated(float CurrentHealth)
+{
 }
 
 UAbilitySystemComponent* AGHCharacterBase::GetAbilitySystemComponent() const
@@ -41,4 +46,14 @@ void AGHCharacterBase::InitializeAbilitySystem()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
+}
+
+void AGHCharacterBase::BindAttributeDelegates()
+{
+	if (!AttributeSet)
+	{
+		return;
+	}
+
+	AttributeSet->OnHealthUpdatedDelegate.AddUObject(this, &AGHCharacterBase::HandleHealthUpdated);
 }

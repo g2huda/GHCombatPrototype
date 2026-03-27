@@ -32,6 +32,8 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	UFUNCTION()
+	virtual void HandleHealthUpdated(float CurrentHealth);
 
 	/** GAS Core */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivate))
@@ -43,6 +45,7 @@ protected:
 
 	/** internal init */
 	void InitializeAbilitySystem();
+	void BindAttributeDelegates();
 
 public:
 

@@ -13,6 +13,10 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+// One param = current health value
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthUpdatedSignature, float);
+
 /**
  * 
  */
@@ -31,6 +35,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnMaxHealthUpdated)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UGHAttributeSet, MaxHealth)
+
+	FOnHealthUpdatedSignature OnHealthUpdatedDelegate;
 
 protected:
 	UFUNCTION()
